@@ -15,16 +15,22 @@ except Exception:
 # ----------------------------
 # Config (Secrets first, then env)
 # ----------------------------
+
 API_KEY = None
-if hasattr(st, "secrets"):
-    API_KEY = st.secrets.get("GOOGLE_API_KEY", None)
+
+# ✅ Safe: won't crash if no secrets.toml exists locally
+try:
+    API_KEY = st.secrets.get("GOOGLE_API_KEY")
+except Exception:
+    API_KEY = None
 
 if not API_KEY:
     API_KEY = os.getenv("GOOGLE_API_KEY")
 
 if not API_KEY:
-    st.error("Missing GOOGLE_API_KEY. Add it in Streamlit Secrets or .env locally.")
+    st.error("Missing GOOGLE_API_KEY. Add it in Streamlit Secrets (cloud) or .env (local).")
     st.stop()
+
 
 client = genai.Client(api_key=API_KEY)
 
